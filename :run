@@ -3,7 +3,7 @@
 Created on Sun Nov  7 01:43:56 2021
 
 @author: ksoo
-""" HTJ
+"""
     
 
 def get_balance(ticker):
@@ -55,7 +55,6 @@ while True:
         t=0
         for i in list(range(0,resolution)):
             if(t<resolution):
-                #print(t)
                 delta_list.loc[t]['x'] = 0
                 delta_list.loc[t]['y'] = 0
                 delta_list.loc[t]['z'] = 0
@@ -74,7 +73,6 @@ while True:
         t=0
         for i in list(range(0,resolution)):
             if(t<resolution):
-                #print(t)
                 if(delta_list.loc[t]['y']>0):
                     delta_list.loc[t]['z'] = delta_list.loc[t]['x'] / delta_list.loc[t]['y']
             t=t+1
@@ -95,6 +93,9 @@ while True:
                 upbit.sell_market_order(ticker,BTC*0.9)
                 flag = "KRW"
         print(now)
+        f = open("output.log", 'w')
+        f.write(now)
+        f.close()
         print(flag)
         time.sleep(900)                     ## check
     except Exception as e:
