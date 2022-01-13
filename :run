@@ -1,27 +1,10 @@
 # -*- coding: utf-8 -*-
-# happy IG
 """
-Created on Sat May  8 15:38:28 2021
+Created on Sun Nov  7 01:43:56 2021
 
 @author: ksoo
 """
-
-# -*- coding: utf-8 -*-
-"""
-Created on Sat May  8 14:52:43 2021
-
-@author: ksoo
-"""
-import pyupbit
-import numpy as np
-import time
-import sys
-import backtesting
-import header
-
-
-upbit = pyupbit.Upbit(access, secret)
-print("autotrade start")    
+    
 
 def get_balance(ticker):
     balances = upbit.get_balances()
@@ -32,67 +15,88 @@ def get_balance(ticker):
             else:
                 return 0
 
+##half-half
+#def half_half(Ticker):
+import time
+import pyupbit
+import datetime
+flag = "KRW"
 while True:
     try:
-        ##value
-        Num_Count = 10
+        now = datetime.datetime.now()
+        access = "SxxCKDi6Uyb9tGOqAGrgEkrFgb444VQxfsCZAB7x"
+        secret = "CkZYlHxBc99mL11VimoXeZfiM5fnAlxhB6vhT1lO"
+        upbit = pyupbit.Upbit(access, secret)
+        import pyupbit
+        import numpy as np
+        import pandas as pd
+        Num_Count = 24
         Num_Range = 2.0
         Num_Per = 0.25
         Num_Worst = Num_Range / Num_Per
         Val_Count =  200
         Value_bit = int(Num_Range*2/Num_Per)
-        #print(str(sys.argv[1]))
-        ticker = sys.argv[1]
-        Array_Genuine = list(range(0, Value_bit))
+        resolution = 10                             ## check
+        sample_count = 500                          ## check
+        PF_value = list(range(0,resolution))
         
         #### for df value
-        df = pyupbit.get_ohlcv(ticker, count=3, interval = "minute60")
-        df['range'] = (df['high'] - df['low']) * 0.5
-        df['target'] = df['open'] + df['range'].shift(1)
-        df['All_Cache'] = 100000.0
-        df['All_Coins'] = 0.0
-        df['Alpha'] = 1.0
-        df['All_Assets'] = 100000.0
-        df['Select'] = "-"
+        ticker = "KRW-BTC"
+        ticker_origin = "BTC"
+        #test.df = pyupbit.get_ohlcv(ticker, count=sample_count*10, interval = "minute30")
+        df = pyupbit.get_ohlcv(ticker, count=sample_count, interval = "minute15")                   ## check
+        df['delta'] = (df['open']/df['open'].shift(1)-1)*100
+        #df.to_excel("test.xlsx",sheet_name="11")
+      
+        #### for initialize
+        delta_list = {'x':list(range(0, resolution)), 'y':list(range(0, resolution)), 'z':list(range(0, resolution))}
+        delta_list = pd.DataFrame(delta_list)
+        delta_list = delta_list.astype(float)
+        t=0
+        for i in list(range(0,resolution)):
+            if(t<resolution):
+                #print(t)
+                delta_list.loc[t]['x'] = 0
+                delta_list.loc[t]['y'] = 0
+                delta_list.loc[t]['z'] = 0
+            t=t+1
+    
+        t=0
+        for i in df.delta:
+            if (-1 < df.delta[t] < 1):
+                if (t<sample_count-1):
+                    tmp = delta_list.loc[int((df.delta[t]+1)*(resolution/2))]['x']
+                    tmp_1 = df.delta[t+1]
+                    delta_list.loc[int((df.delta[t]+1)*(resolution/2))]['x'] =  tmp+tmp_1
+                    delta_list.loc[int((df.delta[t]+1)*(resolution/2))]['y'] =  delta_list.loc[int((df.delta[t]+1)*(resolution/2))]['y']+1
+            t=t+1
+    
+        t=0
+        for i in list(range(0,resolution)):
+            if(t<resolution):
+                #print(t)
+                if(delta_list.loc[t]['y']>0):
+                    delta_list.loc[t]['z'] = delta_list.loc[t]['x'] / delta_list.loc[t]['y']
+            t=t+1
         
-        #### BackTesting
-        Array_Genuine = list(range(0, Value_bit))
-        Alpha_Array = backtesting.BackTest(ticker)
-        j=0
-        t = Alpha_Array
-        for p in list(range(0, Value_bit)): ##initialize
-            Array_Genuine[p] = 0
-        while t!=0:
-            Array_Genuine[j] = t%3
-            t = t//3
-            j = j+1
-        Val_ratio = round((float(df['open'][2]) / float(df['open'][1]) - 1.0)*100.0/Num_Per)+int(Num_Worst)
-        if(Val_ratio > Num_Range):
-            Val_ratio = int(Num_Worst)
-        
-        #### Trade
-        krw = get_balance("KRW")
-        coin = get_balance(ticker)
-        if coin is None:
-            coin = 0
-        Asset = krw + coin * df['open'][2]
-        if (Array_Genuine[Val_ratio] == 0): ### buy
-            if krw > 5000:
-                #upbit.buy_market_order(ticker, Asset/Num_Count)
-                upbit.buy_market_order(ticker, 5000)
-                print(ticker)
-                print("autotrade buy")
-        elif (Array_Genuine[Val_ratio] == 1): ### Sell
-            if coin > 5000/df['open'][2]:
-                #upbit.sell_market_order(ticker, Asset/Num_Count)
-                upbit.sell_market_order(ticker, 5000)
-                print(ticker)
-                print("autotrade sell")
-        elif (Array_Genuine[Val_ratio] == 2): ### Nothing
-            print(ticker)
-            print("autotrade pass")
-            pass
-        time.sleep(3600)
+        if(-1 < df.delta[-1] < 1 ):
+            ##KRW --> BTC
+            krw = get_balance("KRW")
+            #ticker_information = pyupbit.get_ohlcv(ticker, count=1, interval = "minute1")
+            #buy_value = (krw / ticker_information['open'][0]) * 0.9
+            if(delta_list.loc[int((df.delta[-1]+1)*(resolution/2))]['z'] > 0.05 and flag == "KRW"):                 ## check
+                print("buy")
+                upbit.buy_market_order(ticker,krw*0.9)
+                flag = "BTC"
+            ##BTC --> KRW
+            BTC = get_balance(ticker_origin)
+            if(delta_list.loc[int((df.delta[-1]+1)*(resolution/2))]['z'] < -0.05 and flag == "BTC"):                ## check
+                print("sell")
+                upbit.sell_market_order(ticker,BTC*0.9)
+                flag = "KRW"
+        print(now)
+        print(flag)
+        time.sleep(900)                     ## check
     except Exception as e:
         print(e)
         time.sleep(1)
