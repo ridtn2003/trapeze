@@ -1,0 +1,97 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat May  8 15:38:28 2021
+
+@author: ksoo
+"""
+
+# -*- coding: utf-8 -*-
+"""
+Created on Sat May  8 14:52:43 2021
+
+@author: ksoo
+"""
+import pyupbit
+import numpy as np
+import time
+import sys
+import backtesting
+import header
+
+
+upbit = pyupbit.Upbit(access, secret)
+print("autotrade start")    
+
+def get_balance(ticker):
+    balances = upbit.get_balances()
+    for b in balances:
+        if b['currency'] == ticker:
+            if b['balance'] is not None:    
+                return float(b['balance'])
+            else:
+                return 0
+
+while True:
+    try:
+        ##value
+        Num_Count = 10
+        Num_Range = 2.0
+        Num_Per = 0.25
+        Num_Worst = Num_Range / Num_Per
+        Val_Count =  200
+        Value_bit = int(Num_Range*2/Num_Per)
+        #print(str(sys.argv[1]))
+        ticker = sys.argv[1]
+        Array_Genuine = list(range(0, Value_bit))
+        
+        #### for df value
+        df = pyupbit.get_ohlcv(ticker, count=3, interval = "minute60")
+        df['range'] = (df['high'] - df['low']) * 0.5
+        df['target'] = df['open'] + df['range'].shift(1)
+        df['All_Cache'] = 100000.0
+        df['All_Coins'] = 0.0
+        df['Alpha'] = 1.0
+        df['All_Assets'] = 100000.0
+        df['Select'] = "-"
+        
+        #### BackTesting
+        Array_Genuine = list(range(0, Value_bit))
+        Alpha_Array = backtesting.BackTest(ticker)
+        j=0
+        t = Alpha_Array
+        for p in list(range(0, Value_bit)): ##initialize
+            Array_Genuine[p] = 0
+        while t!=0:
+            Array_Genuine[j] = t%3
+            t = t//3
+            j = j+1
+        Val_ratio = round((float(df['open'][2]) / float(df['open'][1]) - 1.0)*100.0/Num_Per)+int(Num_Worst)
+        if(Val_ratio > Num_Range):
+            Val_ratio = int(Num_Worst)
+        
+        #### Trade
+        krw = get_balance("KRW")
+        coin = get_balance(ticker)
+        if coin is None:
+            coin = 0
+        Asset = krw + coin * df['open'][2]
+        if (Array_Genuine[Val_ratio] == 0): ### buy
+            if krw > 5000:
+                #upbit.buy_market_order(ticker, Asset/Num_Count)
+                upbit.buy_market_order(ticker, 5000)
+                print(ticker)
+                print("autotrade buy")
+        elif (Array_Genuine[Val_ratio] == 1): ### Sell
+            if coin > 5000/df['open'][2]:
+                #upbit.sell_market_order(ticker, Asset/Num_Count)
+                upbit.sell_market_order(ticker, 5000)
+                print(ticker)
+                print("autotrade sell")
+        elif (Array_Genuine[Val_ratio] == 2): ### Nothing
+            print(ticker)
+            print("autotrade pass")
+            pass
+        time.sleep(3600)
+    except Exception as e:
+        print(e)
+        time.sleep(1)
