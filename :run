@@ -20,10 +20,13 @@ def get_balance(ticker):
 import time
 import pyupbit
 import datetime
+import key
 flag = "KRW"
 while True:
     try:
         now = datetime.datetime.now()
+        access = key.access_key
+        secret = key.secret_key
         upbit = pyupbit.Upbit(access, secret)
         import pyupbit
         import numpy as np
