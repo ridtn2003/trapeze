@@ -24,8 +24,6 @@ flag = "KRW"
 while True:
     try:
         now = datetime.datetime.now()
-        access = "SxxCKDi6Uyb9tGOqAGrgEkrFgb444VQxfsCZAB7x"
-        secret = "CkZYlHxBc99mL11VimoXeZfiM5fnAlxhB6vhT1lO"
         upbit = pyupbit.Upbit(access, secret)
         import pyupbit
         import numpy as np
