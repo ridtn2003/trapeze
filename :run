@@ -93,9 +93,6 @@ while True:
                 upbit.sell_market_order(ticker,BTC*0.9)
                 flag = "KRW"
         print(now)
-        f = open("output.log", 'w')
-        f.write(now)
-        f.close()
         print(flag)
         time.sleep(900)                     ## check
     except Exception as e:
