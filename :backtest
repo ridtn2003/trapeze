@@ -1,0 +1,163 @@
+
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Nov  7 01:43:56 2021
+
+@author: ksoo
+"""
+    
+
+def get_balance(ticker):
+    balances = upbit.get_balances()
+    for b in balances:
+        if b['currency'] == ticker:
+            if b['balance'] is not None:    
+                return float(b['balance'])
+            else:
+                return 0
+import numpy as np
+import pandas as pd
+import pyupbit
+import datetime
+import time
+##half-half
+#def half_half(Ticker):
+BackTest_list = {'sample_count':(1,10,50,100,500,1000,10000),'Interval':('minute1','minute3','minute5','minute10','minute15','minute30','minute60'),'resolution':(10,20,30,40,50,60,70), 'profit':(0.001,0.005,0.01,0.05,0.1,0.25,0.5)}
+#BackTest_list = {'sample_count':(1,10),'Interval':('minute1','minute3'),'resolution':(10,20)}
+BackTest_list = pd.DataFrame(BackTest_list)
+BackTest_result = ["Empty"]
+ticker = "KRW-BTC"
+ticker_origin = "BTC"
+for xx in list(range(4,7)):
+    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+    print(xx)
+    sample_count = BackTest_list.iloc[xx]['sample_count']
+    for yy in list(range(0,7)):
+        print("yyyyyyyyyyyyy")
+        print(yy)
+        interval_value = BackTest_list.iloc[yy]['Interval']
+        df_test = pyupbit.get_ohlcv(ticker, count=sample_count*10, interval = interval_value)
+        for zz in list(range(0,7)):
+            print("zzzz")
+            print(zz)
+            resolution =BackTest_list.iloc[zz]['resolution']
+            for ww in list(range(0,7)):
+                now = datetime.datetime.now()
+                print(now)
+                print("ww")
+                print(ww)
+                profit = BackTest_list.iloc[ww]['profit']
+                #interval_value = 
+                #resolution = 50
+                #sample_count = 200
+                access = "SxxCKDi6Uyb9tGOqAGrgEkrFgb444VQxfsCZAB7x"
+                secret = "CkZYlHxBc99mL11VimoXeZfiM5fnAlxhB6vhT1lO"
+                upbit = pyupbit.Upbit(access, secret)
+                import pyupbit
+                import numpy as np
+                import pandas as pd
+                Num_Count = 24
+                Num_Range = 2.0
+                Num_Per = 0.25
+                Num_Worst = Num_Range / Num_Per
+                Val_Count =  200
+                Value_bit = int(Num_Range*2/Num_Per)
+                flag = "KRW"
+                PF_value = list(range(0,resolution))
+                
+                #### for df value
+
+                #df_test = df_test.copy(deep=False)
+                result = {'KRW':list(range(0, sample_count*10)), 'BTC':list(range(0, sample_count*10)), 'Total':list(range(0, sample_count*10))}
+                result = pd.DataFrame(result)
+                result = result.astype(float)
+                t=0
+                for i in list(range(0,sample_count*10)):
+                    if(t<sample_count*10):
+                        #print(t)
+                        result.loc[t]['KRW'] = 100000.0
+                        result.loc[t]['BTC'] = 0.0
+                        result.loc[t]['Total'] =  result.loc[t]['KRW'] + result.loc[t]['BTC'] 
+                    t=t+1
+                for k in list(range(sample_count, sample_count*2)):                 ## check
+                    if(k<sample_count*10-1):
+                        #print(k)
+                        df = df_test.iloc[list(range(k,sample_count+k)),:]
+                        df = df.copy(deep=False)
+                        df['delta'] = (df['open']/df['open'].shift(1)-1)*100
+                        #df.to_excel("test.xlsx",sheet_name="11")
+                        #### for initialize
+                        delta_list = {'x':list(range(0, resolution)), 'y':list(range(0, resolution)), 'z':list(range(0, resolution))}
+                        delta_list = pd.DataFrame(delta_list)
+                        delta_list = delta_list.astype(float)
+                        t=0
+                        for i in list(range(0,resolution)):
+                            if(t<resolution):
+                                #print(t)
+                                delta_list.loc[t]['x'] = 0
+                                delta_list.loc[t]['y'] = 0
+                                delta_list.loc[t]['z'] = 0
+                            t=t+1
+                    
+                        t=0
+                        for i in df.delta:
+                            if (-1 < df.delta[t] < 1):
+                                if (t<sample_count-1):
+                                    tmp = delta_list.loc[int((df.delta[t]+1)*(resolution/2))]['x']
+                                    tmp_1 = df.delta[t+1]
+                                    delta_list.loc[int((df.delta[t]+1)*(resolution/2))]['x'] =  tmp+tmp_1
+                                    delta_list.loc[int((df.delta[t]+1)*(resolution/2))]['y'] =  delta_list.loc[int((df.delta[t]+1)*(resolution/2))]['y']+1
+                            t=t+1
+                            #print(t)
+                    
+                        t=0
+                        for i in list(range(0,resolution)):
+                            if(t<resolution):
+                                #print(t)
+                                if(delta_list.loc[t]['y']>0):
+                                    delta_list.loc[t]['z'] = delta_list.loc[t]['x'] / delta_list.loc[t]['y']
+                            t=t+1
+                                
+                        ##KRW --> BTC
+                        #krw = get_balance("KRW")
+                        #ticker_information = pyupbit.get_ohlcv(ticker, count=1, interval = "minute1")
+                        #buy_value = (krw / ticker_information['open'][0]) * 0.9
+                        KRW_before = result.loc[sample_count+k-1]['KRW']
+                        BTC_before = result.loc[sample_count+k-1]['BTC']
+                        result.loc[sample_count+k]['KRW']= result.loc[sample_count+k-1]['KRW']
+                        result.loc[sample_count+k]['BTC']= result.loc[sample_count+k-1]['BTC']
+                        result.loc[sample_count+k-1]['Total'] = result.loc[sample_count+k-1]['KRW'] +result.loc[sample_count+k-1]['BTC'] * df_test.iloc[sample_count+k-1]['open']
+            
+                        if(-1 < df.delta[-1] < 1 ):
+                            if(delta_list.loc[int((df.delta[-1]+1)*(resolution/2))]['z'] > profit*1.0 and flag == "KRW"):
+                                #upbit.buy_market_order(ticker,krw*0.9)
+                                #print("buy")
+                                #print(k)
+                                result.loc[sample_count+k]['BTC'] = BTC_before + (KRW_before*0.9) / df_test.iloc[sample_count+k]['open'] *(1-0.0005)
+                                result.loc[sample_count+k]['KRW'] = KRW_before *0.1
+                                flag = "BTC"
+                            ##BTC --> KRW
+                            #BTC = get_balance(ticker_origin)
+                            if(delta_list.loc[int((df.delta[-1]+1)*(resolution/2))]['z'] < profit*-1.0 and flag == "BTC"):
+                                #print("sell")
+                                #print(k)
+                                KRW_before= result.loc[sample_count+k-1]['KRW']
+                                BTC_before= result.loc[sample_count+k-1]['BTC']
+                                #upbit.sell_market_order(ticker,BTC*0.9)
+                                result.loc[sample_count+k]['KRW'] = KRW_before + BTC_before*0.9 * df_test.iloc[sample_count+k]['open'] * (1-0.0005)
+                                result.loc[sample_count+k]['BTC'] = BTC_before * 0.1
+                                flag = "KRW"
+                BackTest_result.append(result.iloc[-2]['Total'])
+                BackTest_result.append(BackTest_list.iloc[xx]['sample_count'])
+                BackTest_result.append(BackTest_list.iloc[yy]['Interval'])
+                BackTest_result.append(BackTest_list.iloc[zz]['resolution'])
+                BackTest_result.append(BackTest_list.iloc[ww]['profit'])
+                BackTest_result_csv=pd.DataFrame(BackTest_result)
+                print(BackTest_result_csv)
+                BackTest_result_csv.to_excel("test.xlsx",sheet_name="11")
+#result.iloc[-2]['total']
+#result.to_excel("test.xlsx",sheet_name="11")
+BackTest_result=pd.DataFrame(BackTest_result)
+BackTest_result.to_excel("test.xlsx",sheet_name="11")
+
+
