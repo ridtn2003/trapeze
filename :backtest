@@ -30,7 +30,7 @@ BackTest_list = pd.DataFrame(BackTest_list)
 BackTest_result = ["Empty"]
 ticker = "KRW-BTC"
 ticker_origin = "BTC"
-for xx in list(range(0,7)):
+for xx in list(range(1,7)):
     print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     print(xx)
     sample_count = BackTest_list.iloc[xx]['sample_count']
@@ -81,7 +81,7 @@ for xx in list(range(0,7)):
                         result.loc[t]['BTC'] = 0.0
                         result.loc[t]['Total'] =  result.loc[t]['KRW'] + result.loc[t]['BTC'] 
                     t=t+1
-                for k in list(range(sample_count, sample_count*2)):                 ## check
+                for k in list(range(sample_count, sample_count*9)):                 ## check
                     if(k<sample_count*10-1):
                         #print(k)
                         df = df_test.iloc[list(range(k,sample_count+k)),:]
@@ -119,7 +119,6 @@ for xx in list(range(0,7)):
                                 if(delta_list.loc[t]['y']>0):
                                     delta_list.loc[t]['z'] = delta_list.loc[t]['x'] / delta_list.loc[t]['y']
                             t=t+1
-                                
                         ##KRW --> BTC
                         #krw = get_balance("KRW")
                         #ticker_information = pyupbit.get_ohlcv(ticker, count=1, interval = "minute1")
@@ -129,7 +128,7 @@ for xx in list(range(0,7)):
                         result.loc[sample_count+k]['KRW']= result.loc[sample_count+k-1]['KRW']
                         result.loc[sample_count+k]['BTC']= result.loc[sample_count+k-1]['BTC']
                         result.loc[sample_count+k-1]['Total'] = result.loc[sample_count+k-1]['KRW'] +result.loc[sample_count+k-1]['BTC'] * df_test.iloc[sample_count+k-1]['open']
-            
+                        
                         if(-1 < df.delta[-1] < 1 ):
                             if(delta_list.loc[int((df.delta[-1]+1)*(resolution/2))]['z'] > profit*1.0 and flag == "KRW"):
                                 #upbit.buy_market_order(ticker,krw*0.9)
