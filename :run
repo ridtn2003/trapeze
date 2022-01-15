@@ -107,8 +107,14 @@ while True:
         if(count_buy == 2):
             if(krw_buy < krw_sell):
                 print("good")
+                ksoo_balance = get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
+                ksoo_balance = 'ksoo balance = ' + str(ksoo_balance)
+                print(ksoo_balance)
             if(krw_buy > krw_sell):
                 print("bad")
+                ksoo_balance = get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
+                ksoo_balance = 'ksoo balance = ' + str(ksoo_balance)
+                print(ksoo_balance)
         print(now)
         print(flag)
         time.sleep(900)                     ## check
