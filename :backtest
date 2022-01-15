@@ -20,6 +20,8 @@ import pandas as pd
 import pyupbit
 import datetime
 import time
+import key
+
 ##half-half
 #def half_half(Ticker):
 BackTest_list = {'sample_count':(1,10,50,100,500,1000,10000),'Interval':('minute1','minute3','minute5','minute10','minute15','minute30','minute60'),'resolution':(10,20,30,40,50,60,70), 'profit':(0.001,0.005,0.01,0.05,0.1,0.25,0.5)}
