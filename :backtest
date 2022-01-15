@@ -50,8 +50,8 @@ for xx in list(range(1,7)):
                 #interval_value = 
                 #resolution = 50
                 #sample_count = 200
-                access = "SxxCKDi6Uyb9tGOqAGrgEkrFgb444VQxfsCZAB7x"
-                secret = "CkZYlHxBc99mL11VimoXeZfiM5fnAlxhB6vhT1lO"
+                access = key.access_key
+                secret = key.secret_key
                 upbit = pyupbit.Upbit(access, secret)
                 import pyupbit
                 import numpy as np
