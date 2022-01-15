@@ -154,7 +154,7 @@ for xx in list(range(1,7)):
                 BackTest_result.append(BackTest_list.iloc[ww]['profit'])
                 BackTest_result_csv=pd.DataFrame(BackTest_result)
                 print(BackTest_result_csv)
-                BackTest_result_csv.to_excel("test.xlsx",sheet_name="11")
+                #BackTest_result_csv.to_excel("test.xlsx",sheet_name="11")
 #result.iloc[-2]['total']
 #result.to_excel("test.xlsx",sheet_name="11")
 BackTest_result=pd.DataFrame(BackTest_result)
