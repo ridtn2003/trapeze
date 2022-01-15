@@ -30,7 +30,7 @@ BackTest_list = pd.DataFrame(BackTest_list)
 BackTest_result = ["Empty"]
 ticker = "KRW-BTC"
 ticker_origin = "BTC"
-for xx in list(range(1,7)):
+for xx in list(range(0,7)):
     print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
     print(xx)
     sample_count = BackTest_list.iloc[xx]['sample_count']
