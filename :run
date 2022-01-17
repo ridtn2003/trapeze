@@ -36,21 +36,24 @@ while True:
         import pyupbit
         import numpy as np
         import pandas as pd
-        Num_Count = 24
-        Num_Range = 2.0
-        Num_Per = 0.25
-        Num_Worst = Num_Range / Num_Per
-        Val_Count =  200
-        Value_bit = int(Num_Range*2/Num_Per)
-        resolution = 10                             ## check
-        sample_count = 500                          ## check
-        PF_value = list(range(0,resolution))
-        
+        ###important value
+        sample_count = 100                          ## check
+        minute_interval = "minute10"
+        resolution = 40                             ## check
+        min_profit = 0.25
+        #Num_Count = 24
+        #Num_Range = 2.0
+        #Num_Per = 0.25
+        #Num_Worst = Num_Range / Num_Per
+        #Val_Count =  200
+        #Value_bit = int(Num_Range*2/Num_Per)
+
+        PF_value = list(range(0,resolution))        
         #### for df value
         ticker = "KRW-BTC"
         ticker_origin = "BTC"
         #test.df = pyupbit.get_ohlcv(ticker, count=sample_count*10, interval = "minute30")
-        df = pyupbit.get_ohlcv(ticker, count=sample_count, interval = "minute15")                   ## check
+        df = pyupbit.get_ohlcv(ticker, count=sample_count, interval = minute_interval)                   ## check
         df['delta'] = (df['open']/df['open'].shift(1)-1)*100
         #df.to_excel("test.xlsx",sheet_name="11")
       
@@ -88,7 +91,7 @@ while True:
             krw = get_balance("KRW")
             #ticker_information = pyupbit.get_ohlcv(ticker, count=1, interval = "minute1")
             #buy_value = (krw / ticker_information['open'][0]) * 0.9
-            if(delta_list.loc[int((df.delta[-1]+1)*(resolution/2))]['z'] > 0.05 and flag == "KRW"):                 ## check
+            if(delta_list.loc[int((df.delta[-1]+1)*(resolution/2))]['z'] > min_profit and flag == "KRW"):                 ## check
                 print("buy")
                 krw_buy = krw
                 count_buy=1
@@ -97,7 +100,7 @@ while True:
                 
             ##BTC --> KRW
             BTC = get_balance(ticker_origin)
-            if(delta_list.loc[int((df.delta[-1]+1)*(resolution/2))]['z'] < -0.05 and flag == "BTC"):                ## check
+            if(delta_list.loc[int((df.delta[-1]+1)*(resolution/2))]['z'] < min_profit*-1.0 and flag == "BTC"):                ## check
                 print("sell")
                 count_buy=2
                 upbit.sell_market_order(ticker,BTC*0.9)
