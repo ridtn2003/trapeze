@@ -32,9 +32,7 @@ while True:
         total_ask = orderbook[0]['total_ask_size']
         total_biz = orderbook[0]['total_bid_size']
         print(now)
-        print("total_ask")
         print(total_ask)
-        print("totak_biz")
         print(total_biz)
         time.sleep(1)
     except Exception as e:
