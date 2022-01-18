@@ -33,8 +33,8 @@ while True:
         df = pyupbit.get_ohlcv("KRW-BTC", count=1, interval = "minute1")
         total_ask = orderbook[0]['total_ask_size']
         total_biz = orderbook[0]['total_bid_size']
-        print(df['open'][0])
         print(now)
+        print(df['open'][0])
         print(total_ask)
         print(total_biz)
         time.sleep(1)
