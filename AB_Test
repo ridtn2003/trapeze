@@ -30,11 +30,12 @@ while True:
     try:
         now = datetime.datetime.now()
         orderbook = pyupbit.get_orderbook("KRW-BTC", limit_info =True)
-        df = pyupbit.get_ohlcv("KRW-BTC", count=1, interval = "minute1")
+        #df = pyupbit.get_ohlcv("KRW-BTC", count=1, interval = "minute1")
+        price = pyupbit.get_current_price("KRW-BTC")
         total_ask = orderbook[0]['total_ask_size']
         total_biz = orderbook[0]['total_bid_size']
         print(now)
-        print(df['open'][0])
+        print(price)
         print(total_ask)
         print(total_biz)
         time.sleep(1)
