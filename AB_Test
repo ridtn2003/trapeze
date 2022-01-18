@@ -25,12 +25,15 @@ import key
 
 
 money = 100000
+
 while True:
     try:
         now = datetime.datetime.now()
         orderbook = pyupbit.get_orderbook("KRW-BTC", limit_info =True)
+        df = pyupbit.get_ohlcv("KRW-BTC", count=1, interval = "minute1")
         total_ask = orderbook[0]['total_ask_size']
         total_biz = orderbook[0]['total_bid_size']
+        print(df['open'][0])
         print(now)
         print(total_ask)
         print(total_biz)
@@ -72,7 +75,7 @@ if(total_biz > total_ask*weight):
 """
 
 
-#df = pyupbit.get_ohlcv("KRW-BTC", count=10, interval = "minute1")
+#df = pyupbit.get_ohlcv("KRW-BTC", count=1, interval = "minute1")
 
 
 
