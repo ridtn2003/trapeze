@@ -80,7 +80,7 @@ while True:
             Sell_Flag = 0
             Buy_Flag = 1
             print("buy")
-            krw_buy = krw
+            krw_buy = get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
             count_buy=1
             upbit.buy_market_order(ticker,krw*0.9)
             #flag = "BTC"
@@ -96,7 +96,8 @@ while True:
             #Sell_count = Sell_count + 1
             #print("Sell")
         krw = get_balance("KRW")
-        krw_sell = krw
+        krw_sell =  get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
+
         #Asset_End = KRW + BTC * Price   ## 자산 총액
         #print(Asset_End)
         #print(KRW)
@@ -106,18 +107,20 @@ while True:
             if(krw_buy < krw_sell):
                 print("good")
                 ksoo_balance = get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
+                ksoo_balance_value = get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
                 ksoo_balance = 'ksoo balance = ' + str(ksoo_balance)
                 print("Profit of AB")
-                print(ksoo_balance/ksoo_balance_Start*100)
+                print(ksoo_balance_value/ksoo_balance_Start*100)
                 print("Profit of Nature")
                 print(Price/VG_Price_Start*100)
                 print(ksoo_balance)
             if(krw_buy > krw_sell):
                 print("bad")
                 ksoo_balance = get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
+                ksoo_balance_value = get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
                 ksoo_balance = 'ksoo balance = ' + str(ksoo_balance)
                 print("Profit of AB")
-                print(ksoo_balance/ksoo_balance_Start*100)
+                print(ksoo_balance_value/ksoo_balance_Start*100)
                 print("Profit of Nature")
                 print(Price/VG_Price_Start*100)
                 print(ksoo_balance)
