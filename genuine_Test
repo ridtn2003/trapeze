@@ -1,0 +1,186 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr 27 20:54:27 2021
+11
+@author: ksoo
+"""
+def BackTest(Ticker):
+    import pyupbit
+    import numpy as np
+    Num_Count = 24
+    Num_Range = 2.0
+    Num_Per = 0.25
+    Num_Worst = Num_Range / Num_Per
+    Val_Count =  200
+    Value_bit = int(Num_Range*2/Num_Per)
+    
+    #### for df value
+    ticker = "KRW-ETH"
+    df = pyupbit.get_ohlcv(ticker, count=200, interval = "minute60")
+    df['range'] = (df['high'] - df['low']) * 0.5
+    df['target'] = df['open'] + df['range'].shift(1)
+    df['All_Cache'] = 100000.0
+    df['All_Coins'] = 0.0
+    df['Alpha'] = 1.0
+    df['All_Assets'] = 100000.0
+    Array_Genuine = list(range(0, Value_bit))
+    #Sample_Pre_Name = "test_ETH_00" # for string
+    #Output_File = "./DATA_coin/"+ 
+    #df.to_excel(Output_File)
+    
+    #### for initialize
+    for i in Array_Genuine:
+        Array_Genuine[i] = 0
+    
+    Alpha_Array = list(range(0, 64))
+    Alpha_Value = list(range(0, 64))
+    Alpha_Array_tmp = list(range(0, 4))
+    
+    for i in list(range(0, 64)):
+        Alpha_Array[i] = np.random.randint(0,3**Value_bit)
+        #Alpha_Array[i] = np.random.randint(0,3**3)
+    
+    for jj in list(range(0,5)):
+        Sample_Pre_Name = "test_DATA_Frame" # for string
+        Sample_Post_Name = ".xlsx" # for string
+        tmp_string = "_" # for string
+        df['Select'] = "-"
+        for k in list(range(0, 64)):
+            #print(k)
+            j=0
+            if(-1 < Alpha_Array[k] < 3**Value_bit):
+                t = Alpha_Array[k]
+            else:
+                t = 3 ** (Value_bit-1)
+            #print(t)
+            
+            for i in list(range(0, Value_bit)): ##initialize
+                Array_Genuine[i] = 0
+            while t!=0:
+                Array_Genuine[j] = t%3
+                t = t//3
+                j = j+1
+            #print(Array_Genuine)
+            #fee = 0.0032    
+            #r=0
+            for i in range(0,len(df)-1):
+                #print(df)
+                if(round((float(df['open'][i+1]) / float(df['open'][i]) - 1.0)*100.0/Num_Per)+int(Num_Worst) > Num_Range):
+                    Val_ratio = int(Num_Worst)
+                else:
+                    Val_ratio = round((float(df['open'][i+1]) / float(df['open'][i]) - 1.0)*100.0/Num_Per)+int(Num_Worst)
+                if (Array_Genuine[Val_ratio] == 0): ### buy
+                    #df['All_Coins'][i+1] =  df['All_Coins'][i] + (df['All_Assets'][i]/Num_Count)/df['open'][i]
+                    #df['All_Cache'][i+1] = df['All_Cache'][i] - (df['All_Assets'][i]/Num_Count)
+                    df['All_Coins'][i+1] =  df['All_Coins'][i] + 5000/df['open'][i]
+                    df['All_Cache'][i+1] = df['All_Cache'][i] - 5000
+                    df['All_Assets'][i+1] = df['All_Cache'][i+1] + df['All_Coins'][i+1] * df['open'][i+1]
+                    df['Alpha'][i+1] = df['All_Assets'][i+1] / df['All_Assets'][0]
+                    df['Select'][i+1] = "buy"
+            ### Sell
+                elif (Array_Genuine[Val_ratio] == 1): ### Sell
+                    #df['All_Coins'][i+1] = df['All_Coins'][i] - (df['All_Assets'][i]/Num_Count)/df['open'][i]
+                    #df['All_Cache'][i+1] = df['All_Cache'][i] + (df['All_Assets'][i]/Num_Count)
+                    df['All_Coins'][i+1] =  df['All_Coins'][i] + 5000/df['open'][i]
+                    df['All_Cache'][i+1] = df['All_Cache'][i] - 5000
+                    df['All_Assets'][i+1] = df['All_Cache'][i+1] + df['All_Coins'][i+1] * df['open'][i+1]
+                    df['Alpha'][i+1] = df['All_Assets'][i+1] / df['All_Assets'][0]
+                    df['Select'][i+1] = "Sell"
+            ### Do Nothing
+                elif (Array_Genuine[Val_ratio] == 2): ### Nothing
+                    df['All_Coins'][i+1] = df['All_Coins'][i] 
+                    df['All_Cache'][i+1] = df['All_Cache'][i] 
+                    df['All_Assets'][i+1] = df['All_Assets'][i] 
+                    df['Alpha'][i+1] = df['All_Assets'][i+1] / df['All_Assets'][0]
+                    df['Select'][i+1] = "nothing"
+            Output_File = "./DATA_coin/"+ Sample_Pre_Name + tmp_string + str(k) + tmp_string + Sample_Post_Name
+            df.to_excel(Output_File, sheet_name = str(k))
+            Alpha_Value[k] = df['Alpha'][i]
+            #print(Array_Genuine)
+            #print(df)
+            #print(max(Alpha_Array))
+            #print(Array_Genuine)
+        print(Alpha_Value)
+        max_list = sorted(range(len(Alpha_Value)), key=lambda g: Alpha_Value[g])[-4:]
+        max_value = []
+        for i in list(range(0,4)):
+            max_value.append(Alpha_Value[max_list[i]])
+        
+        #print(Alpha_Array)
+        
+        for i in list(range(0,4)):
+            Alpha_Array_tmp[i] = (Alpha_Array[max_list[i]]) 
+        #    print(max_value[i])
+        
+        ## children
+        Alpha_Array[0] = Alpha_Array_tmp[0] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[0] % 3**(Value_bit/2)
+        Alpha_Array[1] = Alpha_Array_tmp[0] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[1] % 3**(Value_bit/2)
+        Alpha_Array[2] = Alpha_Array_tmp[0] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[2] % 3**(Value_bit/2)
+        Alpha_Array[3] = Alpha_Array_tmp[0] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[3] % 3**(Value_bit/2)
+        Alpha_Array[4] = Alpha_Array_tmp[1] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[0] % 3**(Value_bit/2)
+        Alpha_Array[5] = Alpha_Array_tmp[1] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[1] % 3**(Value_bit/2)            #if (df['open'][i] < df['target'][i]):
+        Alpha_Array[6] = Alpha_Array_tmp[1] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[2] % 3**(Value_bit/2)            #df['All_Coins'] = np.where(df['open'] < df['target'], df['All_Coins'].shift(1)+ df['All_Cache'].shift(1)/df['open']/24, df['All_Coins'].shift(1))
+        Alpha_Array[7] = Alpha_Array_tmp[1] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[3] % 3**(Value_bit/2)            #df['All_Cache'] = np.where(df['open'] < df['target'], df['All_Cache'].shift(1) - df['All_Cache'].shift(1)/24, df['All_Cache'].shift(1))
+        Alpha_Array[8] = Alpha_Array_tmp[2] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[0] % 3**(Value_bit/2)            #df['All_Coins'] = np.where(df['open'] > df['target'], df['All_Coins'].shift(1) + (df['All_Cache'].shift(1)/df['open']/24, df['All_Coins'].shift(1)))
+        Alpha_Array[9] = Alpha_Array_tmp[2] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[1] % 3**(Value_bit/2)            #df['All_Assets'] = df['All_Cache'] + df['All_Coins'] * df['open']
+        Alpha_Array[10] = Alpha_Array_tmp[2] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[2] % 3**(Value_bit/2)           #df['ror'] = np.where(df['high'] > df['target'],df['close'] / df['target'], 1)
+        Alpha_Array[11] = Alpha_Array_tmp[2] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[3] % 3**(Value_bit/2)           #df['hpr'] = df['ror'].cumprod()
+        Alpha_Array[12] = Alpha_Array_tmp[3] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[0] % 3**(Value_bit/2)           #df['dd'] = (df['hpr'].cummax() - df['hpr']) / df['hpr'].cummax() * 100
+        Alpha_Array[13] = Alpha_Array_tmp[3] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[1] % 3**(Value_bit/2)           #print("MDD(%): ", df['dd'].max())
+        Alpha_Array[14] = Alpha_Array_tmp[3] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[2] % 3**(Value_bit/2)           #print(df)
+        Alpha_Array[15] = Alpha_Array_tmp[3] // 3**(Value_bit/2) * 3**(Value_bit/2) + Alpha_Array_tmp[3] % 3**(Value_bit/2)  #df.to_excel("dd.xlsx")
+        ## + mutant
+        Alpha_Array[16] = Alpha_Array[0] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[17] = Alpha_Array[1] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[18] = Alpha_Array[2]  + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[19] = Alpha_Array[3] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[20] = Alpha_Array[4] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[21] = Alpha_Array[5] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[22] = Alpha_Array[6] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[23] = Alpha_Array[7] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[24] = Alpha_Array[8] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[25] = Alpha_Array[9] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[26] = Alpha_Array[10] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[27] = Alpha_Array[11] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[28] = Alpha_Array[12] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[29] = Alpha_Array[13] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[30] = Alpha_Array[14] + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[31] = Alpha_Array[15] + 3**np.random.randint(0,Value_bit)
+        ## - Mutant
+        Alpha_Array[32] = Alpha_Array[0] - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[33] = Alpha_Array[1]  - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[34] = Alpha_Array[2]  - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[35] = Alpha_Array[3]  - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[36] = Alpha_Array[4]  - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[37] = Alpha_Array[5]  - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[38] = Alpha_Array[6]  - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[39] = Alpha_Array[7]  - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[40] = Alpha_Array[8]  - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[41] = Alpha_Array[9]  - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[42] = Alpha_Array[10] - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[43] = Alpha_Array[11] - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[44] = Alpha_Array[12] - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[45] = Alpha_Array[13] - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[46] = Alpha_Array[14] - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[47] = Alpha_Array[15] - 3**np.random.randint(0,Value_bit)
+        ## X2 +Mutant
+        Alpha_Array[48] = Alpha_Array[0]  + 3**np.random.randint(0,Value_bit) + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[49] = Alpha_Array[1]  + 3**np.random.randint(0,Value_bit) + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[50] = Alpha_Array[2]  + 3**np.random.randint(0,Value_bit) + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[51] = Alpha_Array[3]  + 3**np.random.randint(0,Value_bit) + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[52] = Alpha_Array[4]  + 3**np.random.randint(0,Value_bit) + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[53] = Alpha_Array[5]  + 3**np.random.randint(0,Value_bit) + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[54] = Alpha_Array[6]  + 3**np.random.randint(0,Value_bit) + 3**np.random.randint(0,Value_bit)
+        Alpha_Array[55] = Alpha_Array[7]  + 3**np.random.randint(0,Value_bit) + 3**np.random.randint(0,Value_bit)
+        ## X2 -Mutant
+        Alpha_Array[56] = Alpha_Array[8]  - 3**np.random.randint(0,Value_bit) - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[57] = Alpha_Array[9]  - 3**np.random.randint(0,Value_bit) - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[58] = Alpha_Array[10] - 3**np.random.randint(0,Value_bit) - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[59] = Alpha_Array[11] - 3**np.random.randint(0,Value_bit) - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[60] = Alpha_Array[12] - 3**np.random.randint(0,Value_bit) - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[61] = Alpha_Array[13] - 3**np.random.randint(0,Value_bit) - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[62] = Alpha_Array[14] - 3**np.random.randint(0,Value_bit) - 3**np.random.randint(0,Value_bit)
+        Alpha_Array[63] = Alpha_Array[15] - 3**np.random.randint(0,Value_bit) - 3**np.random.randint(0,Value_bit)
+        return Alpha_Array_tmp[3]
+
+
