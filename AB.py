@@ -59,8 +59,17 @@ while True:
         line = f.readline()
         line = line.strip('\n')
         k_ratio = float(line)
+        line = f.readline()
+        line = line.strip('\n')
+        longevity_split = float(line)
+        longevity_buy = 0
+        longevity_sell = 0
+        longevity_ratio_buy = longevity_split   ## change
+        longevity_ratio_sell = longevity_split  ## change
+        
         if(k_ratio != k_ratio_Before):
             print(k_ratio)
+            print(longevity_split)
             k_ratio_Before = k_ratio
         f.close()
     #while cnt < 1000000:
@@ -77,24 +86,35 @@ while True:
         bid_amount = orderbook[0]['total_bid_size']
         count_buy = 0
         if(bid_amount > k_ratio * ask_amount and Sell_Flag == 1):  ## BTC 사라
-            Sell_Flag = 0
-            Buy_Flag = 1
-            print("buy")
-            krw_buy = get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
-            count_buy=1
-            upbit.buy_market_order(ticker,krw*0.9)
-            #flag = "BTC"
-            #Buy_count = Buy_count + 1
-            #print("Buy")
-        if(bid_amount * k_ratio < ask_amount and Buy_Flag == 1):  ## BTC 팔아라
-            Sell_Flag = 1
-            Buy_Flag = 0
-            print("sell")
-            count_buy=2
-            upbit.sell_market_order(ticker,BTC*0.9)
-            #flag = "KRW"
-            #Sell_count = Sell_count + 1
-            #print("Sell")
+            longevity_buy = longevity_buy + 1
+            #print(longevity_buy)
+            if(longevity_buy == longevity_ratio_buy):
+                Sell_Flag = 0
+                Buy_Flag = 1
+                print("buy")
+                krw_buy = get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
+                count_buy=1
+                upbit.buy_market_order(ticker,krw*0.9)
+                longevity_buy = 0
+                #flag = "BTC"
+                #Buy_count = Buy_count + 1
+                #print("Buy")
+        elif(bid_amount * k_ratio < ask_amount and Buy_Flag == 1):  ## BTC 팔아라
+            longevity_sell = longevity_sell + 1
+            if(longevity_sell == longevity_ratio_sell):
+                Sell_Flag = 1
+                Buy_Flag = 0
+                print("sell")
+                count_buy=2
+                upbit.sell_market_order(ticker,BTC*0.9)
+                #flag = "KRW"
+                #Sell_count = Sell_count + 1
+                #print("Sell")
+                longevity_sell = 0
+        else:
+            longevity_buy = 0
+            longevity_sell = 0
+
         krw = get_balance("KRW")
         krw_sell =  get_balance('KRW') + get_balance('BTC') * pyupbit.get_current_price('KRW-BTC') 
 
