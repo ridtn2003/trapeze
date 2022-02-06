@@ -81,7 +81,7 @@ while True:
     if(sell_flag == 0):
         if(ask_flag == 0):
             ask_price = ask_price_order
-            sell_uuid = upbit.sell_limit_order(ticker, ask_price, int(BTC_Value))
+            sell_uuid = upbit.sell_limit_order(ticker, ask_price, int(BTC_Value)*0.9)
             print("sell")
             ask_flag = 1    
         elif(ask_flag == 1):
@@ -103,7 +103,7 @@ while True:
                 upbit.cancel_order(sell_uuid['uuid'])
                 print("cancel")
                 BTC_Value = get_balance("JST")
-                sell_uuid = upbit.sell_limit_order(ticker, ask_price, int(BTC_Value))
+                sell_uuid = upbit.sell_limit_order(ticker, ask_price, int(BTC_Value)*0.9)
                 print("sell")
                 time.sleep(1)
 
