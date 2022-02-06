@@ -18,8 +18,9 @@ jj = 0
 for i in list(range(0, 64)):
     Alpha_Array[jj] = np.random.randint(0,2**14)
     jj = jj +1
-
-for t in list(range(0,2)):                  ## L1 유전적 세대 수
+t=0
+while True:                  ## L1 유전적 세대 수
+    t = t+1
     t_str = "***********************t value is " + str(t) + "*********************************"
     print(t_str)
     jj=0    
@@ -141,10 +142,13 @@ for t in list(range(0,2)):                  ## L1 유전적 세대 수
         print(longevity_split_str)
         cnt_split_str = "cnt " + str(cnt_split)
         print(cnt_split_str)
+        Buy_count_str = "Buy_count " + str(Buy_count)
+        print(Buy_count_str)
         Profit_Standard = (Asset_End / Asset_Start * 100) / (VG_Price_End/VG_Price_Start*100) 
         Profit_Standard_str = "profit_Standard " + str(Profit_Standard)
         Profit_Array[jj] = Profit_Standard
         print(Profit_Standard_str)
+
         jj = jj + 1
     max_list = sorted(range(len(Profit_Array)), key=lambda g: Profit_Array[g])[-4:] ## L2 최대값 산출 및 정리
     max_list = max_list[::-1]
@@ -224,7 +228,7 @@ for t in list(range(0,2)):                  ## L1 유전적 세대 수
         Alpha_Array[60] = np.random.randint(0,2**Value_bit)
         Alpha_Array[61] = np.random.randint(0,2**Value_bit)
         Alpha_Array[62] = np.random.randint(0,2**Value_bit)
-        Alpha_Array[63] = np.random.randint(0,2**Value_bit)
+        Alpha_Array[63] = Alpha_Array[0]
     
     Alpha_Array_tmp = Alpha_Array[0]
     k=0
@@ -240,8 +244,12 @@ for t in list(range(0,2)):                  ## L1 유전적 세대 수
     cnt_split  = a[12] * 2**0 + a[13] * 2**1+ a[14] * 2**2   #12~14
     f = open("k.log", 'w')
     f.write(str(k_ratio))
+    f.write("\n")
     f.write(str(longevity_split))
+    f.write("\n")
     f.write(str(cnt_split))
+    f.write("\n")
+    f.write(str(Buy_count))
     f.close()
 
     #print(VG_Price_End/VG_Price_Start*100)
