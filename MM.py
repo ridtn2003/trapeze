@@ -50,10 +50,10 @@ VG_Price_Start = pyupbit.get_current_price("KRW-DOGE")
 
 while True:
     orderbook = pyupbit.get_orderbook(ticker, limit_info =True)
-    ask_price_order = orderbook[0]['orderbook_units'][0]['ask_price']
-    bid_price_order = orderbook[0]['orderbook_units'][0]['bid_price']
-    ask_price_order_0 = orderbook[0]['orderbook_units'][4]['ask_price']
-    bid_price_order_0 = orderbook[0]['orderbook_units'][4]['bid_price']
+    ask_price_order = orderbook[0]['orderbook_units'][1]['ask_price']
+    bid_price_order = orderbook[0]['orderbook_units'][1]['bid_price']
+    ask_price_order_0 = orderbook[0]['orderbook_units'][3]['ask_price']
+    bid_price_order_0 = orderbook[0]['orderbook_units'][3]['bid_price']
     KRW = get_balance("KRW")
     BTC = get_balance("DOGE") * float(pyupbit.get_current_price(ticker))
     BTC_Value = get_balance("DOGE")
