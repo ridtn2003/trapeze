@@ -29,7 +29,7 @@ upbit = pyupbit.Upbit(access, secret)
 
 #tickers=pyupbit.get_tickers()
 #print(tickers)\
-ticker = "KRW-JST"
+ticker = "KRW-DOGE"
 df_test = pyupbit.get_ohlcv(ticker, count=1000, interval = "minute1")
 
 #print(ask_price)
@@ -44,19 +44,19 @@ sell_flag = 1
 
 KRW = get_balance("KRW")
 
-BTC = get_balance("JST") * float(pyupbit.get_current_price(ticker))
+BTC = get_balance("DOGE") * float(pyupbit.get_current_price(ticker))
 ksoo_balance_Start = KRW + BTC
-VG_Price_Start = pyupbit.get_current_price("KRW-JST")
+VG_Price_Start = pyupbit.get_current_price("KRW-DOGE")
 
 while True:
     orderbook = pyupbit.get_orderbook(ticker, limit_info =True)
-    ask_price_order = orderbook[0]['orderbook_units'][1]['ask_price']
-    bid_price_order = orderbook[0]['orderbook_units'][1]['bid_price']
-    ask_price_order_0 = orderbook[0]['orderbook_units'][2]['ask_price']
-    bid_price_order_0 = orderbook[0]['orderbook_units'][2]['bid_price']
+    ask_price_order = orderbook[0]['orderbook_units'][0]['ask_price']
+    bid_price_order = orderbook[0]['orderbook_units'][0]['bid_price']
+    ask_price_order_0 = orderbook[0]['orderbook_units'][4]['ask_price']
+    bid_price_order_0 = orderbook[0]['orderbook_units'][4]['bid_price']
     KRW = get_balance("KRW")
-    BTC = get_balance("JST") * float(pyupbit.get_current_price(ticker))
-    BTC_Value = get_balance("JST")
+    BTC = get_balance("DOGE") * float(pyupbit.get_current_price(ticker))
+    BTC_Value = get_balance("DOGE")
     if(buy_flag == 0):
         if(bid_flag ==  0):         ## 사려는 가격 책정
             bid_price = bid_price_order
@@ -64,7 +64,7 @@ while True:
             print("buy")
             bid_flag = 1
         elif(bid_flag == 1):        ## 살 떄 까지 대기
-            if(upbit.get_order("KRW-JST") == []):
+            if(upbit.get_order("KRW-DOGE") == []):
                 buy_flag = 1
                 sell_flag = 0
                 ask_flag = 0
@@ -85,12 +85,12 @@ while True:
             print("sell")
             ask_flag = 1    
         elif(ask_flag == 1):
-            if(upbit.get_order("KRW-JST") == []):
+            if(upbit.get_order("KRW-DOGE") == []):
                 buy_flag = 0
                 sell_flag = 1
                 bid_flag = 0
-                ksoo_balance = get_balance('KRW') + get_balance('JST') * pyupbit.get_current_price(ticker) 
-                ksoo_balance_value = get_balance('KRW') + get_balance('JST') * pyupbit.get_current_price(ticker) 
+                ksoo_balance = get_balance('KRW') + get_balance('DOGE') * pyupbit.get_current_price(ticker) 
+                ksoo_balance_value = get_balance('KRW') + get_balance('DOGE') * pyupbit.get_current_price(ticker) 
                 ksoo_balance = 'ksoo balance = ' + str(ksoo_balance)
                 print("Profit of MM")
                 print(ksoo_balance_value/ksoo_balance_Start*100)
@@ -102,7 +102,7 @@ while True:
                 #order = upbit.get_order(ticker)
                 upbit.cancel_order(sell_uuid['uuid'])
                 print("cancel")
-                BTC_Value = get_balance("JST")
+                BTC_Value = get_balance("DOGE")
                 sell_uuid = upbit.sell_limit_order(ticker, ask_price, int(BTC_Value)*0.9)
                 print("sell")
                 time.sleep(1)
