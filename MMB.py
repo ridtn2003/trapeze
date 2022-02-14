@@ -105,7 +105,7 @@ while True:
     #box_flag = 1
     if(box_flag == 0):
         if(upbit.get_order(ticker) != []):
-            if(buy_flag == 1):            ## TBD
+            if(buy_flag == 1 and sell_uuid != 0):            ## TBD
                 upbit.cancel_order(sell_uuid['uuid'])
                 time.sleep(10)
                 upbit.sell_market_order(ticker,BTC*0.9)
@@ -113,7 +113,7 @@ while True:
                 print("sell_cancle")
                 #Total_Asset = (Total_Asset + Total_Asset / df_test.iloc[i]['open'] * (price_current - bid_price)) * (1-0.001)
                #print("unbox")
-            if(sell_flag == 1):            ## TBD
+            if(sell_flag == 1 and buy_uuid != 0 ):            ## TBD
                 upbit.cancel_order(buy_uuid['uuid'])
                 print("buy_cancle")
                 time.sleep(10)
