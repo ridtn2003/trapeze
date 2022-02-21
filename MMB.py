@@ -30,7 +30,7 @@ upbit = pyupbit.Upbit(access, secret)
 #tickers=pyupbit.get_tickers()
 #print(tickers)\
 ticker = "KRW-DOGE"
-count_value = 60 * 24 * 1
+count_value = 10
 df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute1")
 orderbook = pyupbit.get_orderbook(ticker, limit_info =True)
 #ask_price = orderbook[0]['orderbook_units'][0]['ask_price']
@@ -172,7 +172,7 @@ while True:
                     print("nature")
                     print(price_current/price_init*100)
                     print("MMB")
-                    print(BTC+krw / Asset_Start * 100)
+                    print((BTC+krw) / Asset_Start * 100)
                     #Total_Asset = (Total_Asset + Total_Asset / df_test.iloc[i]['open'] * (ask_price - bid_price)) * (1-0.001)
                     #print(Total_Asset)
                     #print(bid_price)
@@ -181,6 +181,7 @@ while True:
                     buy_flag = 0
                     ask_flag = 0
                     buy_count = buy_count + 1
+    
     #print(price_current)
     #print(Avg_Box)
     
