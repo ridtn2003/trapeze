@@ -80,6 +80,7 @@ while True:                  ## L1 유전적 세대 수
         tic_sell = a[18] * 2**0 + a[19] + 2**1+ a[20] * 2**2 + a[21] * 2**3 ## 18~21
         #count_value = 6 * 24 * (a[22] * 2**0 + a[23] + 2**1+ a[24] * 2**2 + a[25] * 2**3 + a[26] *2**4)
         count_value = 6 *24 * 7
+        time_box = int(time_box)
         
         
         #time_box = 600
