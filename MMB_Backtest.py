@@ -30,8 +30,7 @@ upbit = pyupbit.Upbit(access, secret)
 #tickers=pyupbit.get_tickers()
 #print(tickers)\
 ticker = "KRW-DOGE"
-count_value = 60 * 24 * 7
-df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute1")
+count_value = 60*24
 orderbook = pyupbit.get_orderbook(ticker, limit_info =True)
 #ask_price = orderbook[0]['orderbook_units'][0]['ask_price']
 #bid_price = orderbook[0]['orderbook_units'][0]['bid_price']
@@ -54,8 +53,9 @@ while True:                  ## L1 유전적 세대 수
     t_str = "***********************t value is " + str(t) + "*********************************"
     print(t_str)
     jj=0    
+    df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute5")
     for i in list(range(0, 64)):            ### L2 Alpha Array 수 Case 64
-        a=list(range(0,Value_bit))                 ### Alpha Array 동안 돌연변이 시험
+        a=list(range(0,Value_bit))                 ### Alpha Array 동안 돌연변이 시험 
         k=0        
         for i in a:
             a[k] = 0 
@@ -72,14 +72,13 @@ while True:                  ## L1 유전적 세대 수
             Alpha_Array_tmp = Alpha_Array_tmp//2
             #print(Alpha_Array_tmp)
             k= k+1
-        time_box = a[0] * 2**0 + a[1] * 2**1+ a[2] * 2**2+ a[3] * 2**3+ a[4] * 2**4+ a[5] * 2**5 + a[6] * 2**6+ a[7] * 2**7+ a[8] * 2**8+ a[9] * 2**9 ## 0~9
+        time_box = a[0] * 2**0 + a[1] * 2**1+ a[2] * 2**2+ a[3] * 2**3+ a[4] * 2**4+ a[5] * 2**5 
         if(time_box == 0):
             time_box = 1
         range_box = a[10] * 2**0 + a[11] + 2**1+ a[12] * 2**2 + a[13] * 2**3 ## 10~13 
         tic_buy = a[14] * 2**0 + a[15] + 2**1 + a[16] * 2**2 + a[17] * 2**3 ## 14~17
         tic_sell = a[18] * 2**0 + a[19] + 2**1+ a[20] * 2**2 + a[21] * 2**3 ## 18~21
         #count_value = 6 * 24 * (a[22] * 2**0 + a[23] + 2**1+ a[24] * 2**2 + a[25] * 2**3 + a[26] *2**4)
-        count_value = 6 *24 * 7
         time_box = int(time_box)
         
         
@@ -108,7 +107,7 @@ while True:                  ## L1 유전적 세대 수
         price_buy = price_current - 0.5
         price_sell = price_current + 0.5
         box_flag = 0
-        for i in list(range(0, count_value )):
+        for j in list(range(0, count_value )):
             price_currnet_before = price_current
             price_buy_before = price_buy
             price_sell_before = price_sell
@@ -118,11 +117,11 @@ while True:                  ## L1 유전적 세대 수
             Avg_Box = price_current
             ## Box권 설정
             #print(price_current)
-            if(i > 10):
+            if(j > 10):
                 Total_Box = list(range(0,time_box))
                 Sum_Box = 0
                 for k in list(range(0, time_box)) :
-                    Total_Box[k] =  df_test.iloc[i-k]['open'] - 0.5
+                    Total_Box[k] =  df_test.iloc[j-k]['open'] - 0.5
                     Sum_Box = Sum_Box + Total_Box[k]
                 Avg_Box = round(Sum_Box / time_box)
                 max_list = sorted(range(len(Total_Box)), key=lambda g: Total_Box[g])[-1 * time_box:]
@@ -299,7 +298,8 @@ while True:                  ## L1 유전적 세대 수
         Alpha_Array_tmp = Alpha_Array_tmp//2
         #print(Alpha_Array_tmp)
         k= k+1
-    time_box = a[0] * 2**0 + a[1] * 2**1+ a[2] * 2**2+ a[3] * 2**3+ a[4] * 2**4+ a[5] * 2**5 + a[6] * 2**6+ a[7] * 2**7+ a[8] * 2**8+ a[9] * 2**9 ## 0~9
+    #time_box = a[0] * 2**0 + a[1] * 2**1+ a[2] * 2**2+ a[3] * 2**3+ a[4] * 2**4+ a[5] * 2**5 + a[6] * 2**6+ a[7] * 2**7+ a[8] * 2**8+ a[9] * 2**9 ## 0~9
+    time_box = a[0] * 2**0 + a[1] * 2**1+ a[2] * 2**2+ a[3] * 2**3+ a[4] * 2**4+ a[5] * 2**5 
     if(time_box == 0):
         time_box = 1
     range_box = a[10] * 2**0 + a[11] + 2**1+ a[12] * 2**2 + a[13] * 2**3 ## 10~13 
