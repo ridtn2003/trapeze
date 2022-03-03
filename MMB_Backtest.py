@@ -44,16 +44,27 @@ max_Array = list(range(0,4))
 Value_bit = 22
 jj = 0
 for i in list(range(0, 64)):
-    Alpha_Array[jj] = np.random.randint(0,2**Value_bit)
+    time_box = 10
+    range_box = 5
+    tic_buy = 0
+    tic_sell = 2
+    Alpha_Array_tmp = time_box + range_box * 2**10 + tic_buy * 2**14 + tic_sell * 2**18
+    Alpha_Array[jj] = Alpha_Array_tmp
+    jj = jj +1
+jj=0
+for i in list(range(0, 64)):
+    Profit_Array[jj] = 0
     jj = jj +1
 t=0
+df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute5")
+
 while True:                  ## L1 유전적 세대 수
 #for i in list(range(0,2)):
     t = t+1
     t_str = "***********************t value is " + str(t) + "*********************************"
     print(t_str)
     jj=0    
-    df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute5")
+    #df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute5")
     for i in list(range(0, 64)):            ### L2 Alpha Array 수 Case 64
         a=list(range(0,Value_bit))                 ### Alpha Array 동안 돌연변이 시험 
         k=0        
@@ -72,15 +83,15 @@ while True:                  ## L1 유전적 세대 수
             Alpha_Array_tmp = Alpha_Array_tmp//2
             #print(Alpha_Array_tmp)
             k= k+1
+            
         time_box = a[0] * 2**0 + a[1] * 2**1+ a[2] * 2**2+ a[3] * 2**3+ a[4] * 2**4+ a[5] * 2**5 
         if(time_box == 0):
             time_box = 1
-        range_box = a[10] * 2**0 + a[11] + 2**1+ a[12] * 2**2 + a[13] * 2**3 ## 10~13 
-        tic_buy = a[14] * 2**0 + a[15] + 2**1 + a[16] * 2**2 + a[17] * 2**3 ## 14~17
-        tic_sell = a[18] * 2**0 + a[19] + 2**1+ a[20] * 2**2 + a[21] * 2**3 ## 18~21
+        range_box = a[10] * 2**0 + a[11] * 2**1 + a[12] * 2**2 + a[13] * 2**3 ## 10~13 
+        tic_buy = a[14] * 2**0 + a[15] * 2**1 + a[16] * 2**2 + a[17] * 2**3 ## 14~17
+        tic_sell = a[18] * 2**0 + a[19] * 2**1 + a[20] * 2**2 + a[21] * 2**3 ## 18~21
         #count_value = 6 * 24 * (a[22] * 2**0 + a[23] + 2**1+ a[24] * 2**2 + a[25] * 2**3 + a[26] *2**4)
         time_box = int(time_box)
-        
         
         #time_box = 600
         #range_box = 4   
@@ -112,7 +123,7 @@ while True:                  ## L1 유전적 세대 수
             price_currnet_before = price_current
             price_buy_before = price_buy
             price_sell_before = price_sell
-            price_current = df_test.iloc[i]['open'] - 0.5
+            price_current = df_test.iloc[j]['open'] - 0.5
             price_buy = price_current - 0.5
             price_sell = price_current + 0.5
             Avg_Box = price_current
@@ -141,7 +152,7 @@ while True:                  ## L1 유전적 세대 수
             if(box_flag == 0):
                 if(sell_flag == 0):
                     Total_Asset = (Total_Asset + Total_Asset / df_test.iloc[i]['open'] * (price_current - bid_price)) * (1-0.001)
-                    print("unbox")
+                    #print("unbox")
                 ##flag init
                 buy_flag = 0
                 bid_flag = 0
@@ -156,7 +167,6 @@ while True:                  ## L1 유전적 세대 수
                         #bid_price = price_buy - tic_buy
                         if(Avg_Box - tic_buy <= price_buy):
                             bid_price = Avg_Box - tic_buy
-                            #print(bid_price)
                             bid_flag = 1
                         elif(Avg_Box - tic_buy > price_buy):
                             bid_price = price_buy - tic_buy
@@ -192,7 +202,7 @@ while True:                  ## L1 유전적 세대 수
                             buy_count = buy_count + 1
             #print(price_current)
             #print(Avg_Box)
-        print(Total_Asset)
+        #print(Total_Asset)
         if(sell_flag == 0):
             Total_Asset = (Total_Asset + Total_Asset / df_test.iloc[i]['open'] * (price_current - bid_price)) * (1-0.001)
         VG_Price_End = price_current
@@ -250,22 +260,22 @@ while True:                  ## L1 유전적 세대 수
         Alpha_Array[30] = int(Alpha_Array[14] + 2**np.random.randint(0,Value_bit))
         Alpha_Array[31] = int(Alpha_Array[15] + 2**np.random.randint(0,Value_bit))
         ## - Mutant
-        Alpha_Array[32] = int(Alpha_Array[0] - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[33] = int(Alpha_Array[1]  - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[34] = int(Alpha_Array[2]  - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[35] = int(Alpha_Array[3]  - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[36] = int(Alpha_Array[4]  - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[37] = int(Alpha_Array[5]  - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[38] = int(Alpha_Array[6]  - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[39] = int(Alpha_Array[7]  - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[40] = int(Alpha_Array[8]  - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[41] = int(Alpha_Array[9]  - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[42] = int(Alpha_Array[10] - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[43] = int(Alpha_Array[11] - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[44] = int(Alpha_Array[12] - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[45] = int(Alpha_Array[13] - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[46] = int(Alpha_Array[14] - 2**np.random.randint(0,Value_bit))
-        Alpha_Array[47] = int(Alpha_Array[15] - 2**np.random.randint(0,Value_bit))
+        Alpha_Array[32] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[33] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[34] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[35] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[36] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[37] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[38] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[39] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[40] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[41] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[42] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[43] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[44] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[45] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[46] = int(np.random.randint(0,2**Value_bit))
+        Alpha_Array[47] = int(np.random.randint(0,2**Value_bit))
         ## X2 +Mutant
         Alpha_Array[48] = int(np.random.randint(0,2**Value_bit))
         Alpha_Array[49] = int(np.random.randint(0,2**Value_bit))
@@ -302,9 +312,9 @@ while True:                  ## L1 유전적 세대 수
     time_box = a[0] * 2**0 + a[1] * 2**1+ a[2] * 2**2+ a[3] * 2**3+ a[4] * 2**4+ a[5] * 2**5 
     if(time_box == 0):
         time_box = 1
-    range_box = a[10] * 2**0 + a[11] + 2**1+ a[12] * 2**2 + a[13] * 2**3 ## 10~13 
-    tic_buy = a[14] * 2**0 + a[15] + 2**1 + a[16] * 2**2 + a[17] * 2**3 ## 14~17
-    tic_sell = a[18] * 2**0 + a[19] + 2**1+ a[20] * 2**2 + a[21] * 2**3 ## 18~21
+    range_box = a[10] * 2**0 + a[11] * 2**1+ a[12] * 2**2 + a[13] * 2**3 ## 10~13 
+    tic_buy = a[14] * 2**0 + a[15] * 2**1 + a[16] * 2**2 + a[17] * 2**3 ## 14~17
+    tic_sell = a[18] * 2**0 + a[19] * 2**1+ a[20] * 2**2 + a[21] * 2**3 ## 18~21
     #count_value = 6 * 24 * (a[22] * 2**0 + a[23] + 2**1+ a[24] * 2**2 + a[25] * 2**3 + a[26] *2**4)
     print("time_box")
     print(time_box)
@@ -315,6 +325,8 @@ while True:                  ## L1 유전적 세대 수
     print("tic_sell")
     print(tic_sell)
     print(count_value)
+    print(Alpha_Array_tmp)
+    print()
 if(sell_flag == 0):
     Total_Asset = (Total_Asset + Total_Asset / df_test.iloc[i]['open'] * (price_current - bid_price)) * (1-0.001)
 print(Total_Asset)
