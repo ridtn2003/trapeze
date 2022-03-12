@@ -56,17 +56,18 @@ for i in list(range(0, 64)):
     Profit_Array[jj] = 0
     jj = jj +1
 t=0
-df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute5")
-
 while True:                  ## L1 유전적 세대 수
 #for i in list(range(0,2)):
+    
+    df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute5")
+    if df_test is None : continue
+
     t = t+1
     t_str = "***********************t value is " + str(t) + "*********************************"
     print(t_str)
     jj=0    
-    #df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute5")
     for i in list(range(0, 64)):            ### L2 Alpha Array 수 Case 64
-        a=list(range(0,Value_bit))                 ### Alpha Array 동안 돌연변이 시험 
+        a=list(range(0,Value_bit*2))                 ### Alpha Array 동안 돌연변이 시험 
         k=0        
         for i in a:
             a[k] = 0 
@@ -294,6 +295,7 @@ while True:                  ## L1 유전적 세대 수
         Alpha_Array[61] = int(np.random.randint(0,2**Value_bit))
         Alpha_Array[62] = int(np.random.randint(0,2**Value_bit))
         Alpha_Array[63] = int(np.random.randint(0,2**Value_bit))
+
 
     Alpha_Array_tmp = Alpha_Array[0]
     k=0    
