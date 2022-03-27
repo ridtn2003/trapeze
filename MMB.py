@@ -39,14 +39,14 @@ orderbook = pyupbit.get_orderbook(ticker, limit_info =True)
 #print(ask_price)
 #print(bid_price)
 
-time_box = 10
-range_box = 5
+time_box = 4
+range_box = 15
 tic_value = 10
 margin_value = 10
 Profit_Array = list(range(0,tic_value*tic_value*margin_value))
 margin = 0
-tic_buy = 0
-tic_sell = 2
+tic_buy = 1
+tic_sell = 0
 
 Total_Asset = 100000
 buy_count = 0
@@ -75,6 +75,7 @@ buy_uuid = 0
 #for i in list(range(0, count_value )):
 while True:
     df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute1")
+    if df_test is None : continue
     price_currnet_before = price_current
     price_buy_before = price_buy
     price_sell_before = price_sell
