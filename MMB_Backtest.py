@@ -30,7 +30,7 @@ upbit = pyupbit.Upbit(access, secret)
 #tickers=pyupbit.get_tickers()
 #print(tickers)\
 ticker = "KRW-DOGE"
-count_value = 60*24
+count_value = 60 * 24
 orderbook = pyupbit.get_orderbook(ticker, limit_info =True)
 #ask_price = orderbook[0]['orderbook_units'][0]['ask_price']
 #bid_price = orderbook[0]['orderbook_units'][0]['bid_price']
@@ -56,10 +56,9 @@ for i in list(range(0, 64)):
     Profit_Array[jj] = 0
     jj = jj +1
 t=0
+df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute1")
 while True:                  ## L1 유전적 세대 수
 #for i in list(range(0,2)):
-    
-    df_test = pyupbit.get_ohlcv(ticker, count= count_value, interval = "minute5")
     if df_test is None : continue
 
     t = t+1
@@ -93,24 +92,14 @@ while True:                  ## L1 유전적 세대 수
         tic_sell = a[18] * 2**0 + a[19] * 2**1 + a[20] * 2**2 + a[21] * 2**3 ## 18~21
         #count_value = 6 * 24 * (a[22] * 2**0 + a[23] + 2**1+ a[24] * 2**2 + a[25] * 2**3 + a[26] *2**4)
         time_box = int(time_box)
-        
-        #time_box = 600
-        #range_box = 4   
-        #tic_buy = 0
-        #tic_sell = 2
-        #tic_value = 10
-        margin_value = 10
-        #Profit_Array = list(range(0,tic_value*tic_value*margin_value))
-        margin = 0
         Total_Asset = 100000
         buy_count = 0
         k=0
-        ## flag init
+        ## flag init 
         bid_flag = 0
         buy_flag = 0
         sell_flag = 1
         ask_flag = 1
-        
         ask_price = 0
         bid_price  = 0
         Total_Box = 0 
@@ -120,6 +109,9 @@ while True:                  ## L1 유전적 세대 수
         price_buy = price_current - 0.5
         price_sell = price_current + 0.5
         box_flag = 0
+        Total_Box = list(range(0,time_box))
+        Sum_Box = 0
+        box_i=0
         for j in list(range(0, count_value )):
             price_currnet_before = price_current
             price_buy_before = price_buy
@@ -130,24 +122,25 @@ while True:                  ## L1 유전적 세대 수
             Avg_Box = price_current
             ## Box권 설정
             #print(price_current)
-            if(j > 10):
-                Total_Box = list(range(0,time_box))
-                Sum_Box = 0
-                for k in list(range(0, time_box)) :
-                    Total_Box[k] =  df_test.iloc[j-k]['open'] - 0.5
-                    Sum_Box = Sum_Box + Total_Box[k]
+            Total_Box[box_i] =  df_test.iloc[j]['open'] - 0.5
+            Sum_Box = Sum_Box + Total_Box[box_i]
+            box_i = box_i + 1
+            if(box_i == time_box):
+                box_i = 0
+            if(j>time_box):
                 Avg_Box = round(Sum_Box / time_box)
                 max_list = sorted(range(len(Total_Box)), key=lambda g: Total_Box[g])[-1 * time_box:]
                 min_box = Total_Box[max_list[0]]
                 max_box = Total_Box[max_list[-1]]
-                if(max_box < min_box + range_box):
-                    box_flag = 1
-                    #print("box")
-                if(max_box >= min_box + range_box):
-                    box_flag = 0                 
-                    #print("unbox")
-                    #print(min_box)
-                    #print(max_box)
+                if(j > 10):
+                    if(max_box < min_box + range_box):
+                        box_flag = 1
+                        #print("box")
+                    if(max_box >= min_box + range_box):
+                        box_flag = 0                 
+                        #print("unbox")
+                        #print(min_box)
+                        #print(max_box)
             ## Box 권에서만 동작
             #box_flag = 1
             if(box_flag == 0):
@@ -210,11 +203,18 @@ while True:                  ## L1 유전적 세대 수
         Asset_End = Total_Asset
         Asset_Start = 100000
         Profit_Standard = (Asset_End / Asset_Start * 100) / (VG_Price_End/VG_Price_Start*100) 
+        if(buy_count == 0 ):
+            Profit_Standard = 0
         Profit_Standard_str = "profit_Standard " + str(Profit_Standard)
-        print(Profit_Standard_str)
         Profit_Array[jj] = Profit_Standard
-        print(Alpha_Array[jj])
-        print(jj)
+        if(buy_count != 0):
+            print(Profit_Standard_str)
+            print(Alpha_Array[jj])
+            print(buy_count)
+        else:
+            print("nothing")
+        
+        #print(jj)
         jj = jj + 1
     max_list = sorted(range(len(Profit_Array)), key=lambda g: Profit_Array[g])[-4:] ## L2 최대값 산출 및 정리
     max_list = max_list[::-1]
@@ -334,7 +334,6 @@ if(sell_flag == 0):
 print(Total_Asset)
 
 
-Profit_Array[tic_sell * 100 + tic_buy * 10 + margin] = Total_Asset        
 
 
 
